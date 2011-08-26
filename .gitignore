@@ -1,0 +1,12 @@
+# Typical LaTeX and emacs generated output
+auto
+*.aux
+*~
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.bak
+*.cb
+*.vrb
