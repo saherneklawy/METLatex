@@ -6,3 +6,10 @@ met.guc.edu.eg
 
 LaTeX templates for coursework documents
 Repository started on August 25th, 2011
+
+----
+
+newcsen.cls              - new class file to compile course documents
+config.tex               - example file to test the class
+PracticeAssignment01.tex - example file to test the class
+

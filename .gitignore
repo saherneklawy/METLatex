@@ -1,5 +1,6 @@
-# Typical LaTeX and emacs generated output
-auto
+# LaTeX generated files
+*.bat
+*.cfg
 *.aux
 *~
 *.log
@@ -10,3 +11,10 @@ auto
 *.bak
 *.cb
 *.vrb
+*.dvi
+
+# AUCTeX (emacs) e-lisp directory
+auto/
+
+# Vim specific files
+*.swp
