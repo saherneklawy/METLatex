@@ -6,17 +6,9 @@
 
 \begin{document}
 
-\csenmarktable
-
-
-\begin{exercise}{5}{}{}
-  Test
+\begin{exercise}{5}{Theme}{Name}
+  Test 1: With theme and name, 5 Marks
 \end{exercise}
-
-Page 1
-\newpage
-
-Page 2
 
 \begin{figure}[ht]
   \centering
@@ -25,20 +17,30 @@ Page 2
   \label{fig:test}
 \end{figure}
 
+\begin{exercise}{3}{}{}
+  Test 2: No theme, no name, 3 Marks
+\end{exercise}
+
 \begin{exercise}{6}{}{}
-  Test
+  Test 3: No theme, no name, 6 Marks
+\end{exercise}
+ 
+\begin{exercise}{}{}{}
+  Test 4: No theme, no name, no Marks. Should produce clear output
+  when marking is active
 \end{exercise}
 
-\begin{exercise}{7}{}{}
-  Test
-\end{exercise}
- 
-\begin{exercise}{8}{}{}
-  Test
-\end{exercise}
- 
+\begin{bonusexercise}{13}{Bonus}{Bonusexercise}
+  Test 5: Bonusexercise with theme and name and 13 marks. Should be
+  indistinguishable from normal exercise if marking is off
+\end{bonusexercise}
 
- 
+\begin{bonusexercise}{}{No}{Marks}
+  Test 6: Bonusexercise with theme and name and no marks. Should be
+  indistinguishable from normal exercise if marking is off, should
+  produce clear warning if marking is active.
+\end{bonusexercise}
+
 \end{document}
 
 %%% Local Variables: 

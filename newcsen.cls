@@ -32,8 +32,8 @@
 %----------------------------------------------------------------------%
 %   Commands for config.tex
 
-%   \Institute     - sets the institute (defaults to "The German University in Cairo")
-%   \Department    - sets the department (defaults to "Dpt. for Media Engineering and Technology")
+%   \Institute{}   - sets the institute (defaults to "The German University in Cairo")
+%   \Department{}  - sets the department (defaults to "Dpt. for Media Engineering and Technology")
 %   \Class{}       - sets the class code
 %   \Title{}       - sets the title of the class
 %   \Lecturer[]{}  - sets the class lecturer (optional short name)
@@ -43,12 +43,21 @@
 %----------------------------------------------------------------------%
 %   Commands for individual files
 
-%   \Topic         - sets the topic of the exercise set
-%   \Date          - sets the discussion/submission/exam date
+%   \Topic{}       - sets the topic of the exercise set
+%   \Date{}        - sets the discussion/submission/exam date
+
+%----------------------------------------------------------------------%
+%   Commands for inofficial use only
+
+%   \Exercisename{}       - Sets a name for the exercise header (default: Exercise)
+%   \Bonusname{}          - Sets a name for the bonus exercise header (default: Bonus Exercise)
+%   \Exerciseheadskip{}   - Sets a distance between number, theme and title
 
 %----------------------------------------------------------------------%
 %   Environments
 
+%   \begin{exercise}{Marks}{Theme}{Title} ... \end{exercise}
+%   \begin{bonusexercise}{Marks}{Theme}{Title} ... \end{bonusexercise}
 
 %======================================================================%
 
@@ -61,34 +70,51 @@
 \RequirePackage{color}
 \RequirePackage{fancyhdr}
 \RequirePackage{multido}
+\RequirePackage{colortbl}
 \RequirePackage[a4paper]{geometry}
-%\RequirePackage[pdfauthor={\Author},pdftitle={\Title},pdfsubject={A Dissertation},pdfkeywords={\Keywords},hypertexnames=false,plainpages=false,pdfpagelabels,bookmarks,colorlinks=true,linktocpage=true,backref,letterpaper,hyperindex]{hyperref}
 
 \makeatletter
 
 %----------------------------------------------------------------------%
 %   Options and flags
 
-\newboolean{solution}
-\newboolean{practice}
-\newboolean{assignment}
-\newboolean{popquiz}
-\newboolean{quiz}
-\newboolean{mock}
-\newboolean{midterm}
-\newboolean{final}
-\newboolean{makeup}
-\newboolean{subtitle}
-\newboolean{cover}
-\newboolean{identity}
-\newboolean{marking}
-\newboolean{logo}
+\newboolean{solution}%     - Solution is shown
+\newboolean{numbered}%     - Assessment is numbered
+
+\newboolean{practice}%     - Assessment is a practice assignment
+\newboolean{assignment}%   - Assessment is an assignment
+\newboolean{popquiz}%      - Assessment is a pop-quiz
+\newboolean{quiz}%         - Assessment is a quiz
+
+\newboolean{mock}%         - Assessment is a mock exam
+\newboolean{midterm}%      - Assessment is a midterm exam
+\newboolean{final}%        - Assessment is a final exam
+\newboolean{makeup}%       - Assessment is a makeup exam
+
+\newboolean{subtitle}%     - A subtitle will be printed
+\newboolean{exam}%         - Assessment is some kind of exam
+\newboolean{cover}%        - A cover page is generated
+\newboolean{identity}%     - A form for name and tutorial is generated
+\newboolean{marking}%      - The assessment is marked (no practice, no mock)
+\newboolean{logo}%         - A logo is printed on each left header
 
 \newcommand{\@csenassessmenttitle}{Practice assignment}
-\setboolean{practice}{true}
+\setboolean{practice}{true}%
+\setboolean{numbered}{true}%
+\setboolean{assignment}{false}%
+\setboolean{popquiz}{false}%
+\setboolean{quiz}{false}%
+\setboolean{mock}{false}%
+\setboolean{midterm}{false}%
+\setboolean{final}{false}%
+\setboolean{makeup}{false}%
+\setboolean{identity}{false}%
+\setboolean{cover}{false}%
+\setboolean{marking}{false}%
 
 \DeclareOption{solution}{\setboolean{solution}{true}}%
 \DeclareOption{practice}{\setboolean{practice}{true}%
+  \setboolean{numbered}{true}%
   \setboolean{assignment}{false}%
   \setboolean{popquiz}{false}%
   \setboolean{quiz}{false}%
@@ -101,6 +127,7 @@
   \setboolean{marking}{false}%
   \renewcommand{\@csenassessmenttitle}{Practice assignment}}%
 \DeclareOption{assignment}{\setboolean{assignment}{true}%
+  \setboolean{numbered}{true}%
   \setboolean{practice}{false}%
   \setboolean{popquiz}{false}%
   \setboolean{quiz}{false}%
@@ -113,6 +140,7 @@
   \setboolean{marking}{true}%
   \renewcommand{\@csenassessmenttitle}{Assignment}}%
 \DeclareOption{popquiz}{\setboolean{popquiz}{true}%
+  \setboolean{numbered}{true}%
   \setboolean{practice}{false}%
   \setboolean{assignment}{false}%
   \setboolean{quiz}{false}%
@@ -125,6 +153,7 @@
   \setboolean{marking}{true}%
   \renewcommand{\@csenassessmenttitle}{Pop quiz}}%
 \DeclareOption{quiz}{\setboolean{quiz}{true}%
+  \setboolean{numbered}{true}%
   \setboolean{practice}{false}%
   \setboolean{assignment}{false}%
   \setboolean{popquiz}{false}%
@@ -137,6 +166,7 @@
   \setboolean{marking}{true}%
   \renewcommand{\@csenassessmenttitle}{Quiz}}%
 \DeclareOption{mock}{\setboolean{mock}{true}%
+  \setboolean{numbered}{false}%
   \setboolean{practice}{false}%
   \setboolean{assignment}{false}%
   \setboolean{popquiz}{false}%
@@ -149,6 +179,7 @@
   \setboolean{marking}{false}%
   \renewcommand{\@csenassessmenttitle}{Mock exam}}%
 \DeclareOption{midterm}{\setboolean{midterm}{true}%
+  \setboolean{numbered}{false}%
   \setboolean{practice}{false}%
   \setboolean{assignment}{false}%
   \setboolean{popquiz}{false}%
@@ -161,6 +192,7 @@
   \setboolean{marking}{false}%
   \renewcommand{\@csenassessmenttitle}{Midterm exam}}%
 \DeclareOption{final}{\setboolean{final}{true}%
+  \setboolean{numbered}{false}%
   \setboolean{practice}{false}%
   \setboolean{assignment}{false}%
   \setboolean{popquiz}{false}%
@@ -173,6 +205,7 @@
   \setboolean{marking}{true}%
   \renewcommand{\@csenassessmenttitle}{Final exam}}%
 \DeclareOption{makeup}{\setboolean{makeup}{true}%
+  \setboolean{numbered}{false}%
   \setboolean{practice}{false}%
   \setboolean{assignment}{false}%
   \setboolean{popquiz}{false}%
@@ -240,12 +273,12 @@
 \newcounter{assessment}
 \setcounter{assessment}{1}
 \renewcommand{\theassessment}{\arabic{assessment}}
-\newcommand{\assessmentnumber}{\@csenassessmenttitle\ \theassessment}
+\newcommand{\@assessmentform}{\@csenassessmenttitle\ifthenelse{\boolean{numbered}}{\ \theassessment}{}}
 \newcommand{\Number}[1]{\setcounter{assessment}{#1}}
 
 \newcounter{exercise}
 \setcounter{exercise}{0}
-\renewcommand{\theexercise}{\arabic{exercise}}
+\renewcommand{\theexercise}{\ifthenelse{\boolean{numbered}}{\theassessment--}{}\arabic{exercise}}
 
 \newcounter{marktableexercise}
 \setcounter{marktableexercise}{0}
@@ -257,25 +290,90 @@
 %----------------------------------------------------------------------%
 %   Environments
 
+%   Exercise
 \newcommand{\@exercisename}{Exercise}
 \newcommand{\Exercisename}[1]{\renewcommand{\@exercisename}{#1}}
 
+\newcommand{\@bonusname}{\ifthenelse{\boolean{marking}}{Bonus\ }{}Exercise}
+\newcommand{\Bonusname}[1]{\renewcommand{\@bonusname}{#1}}
+
+\newcommand{\@exerciseheadskip}{2em}
+\newcommand{\Exerciseheadskip}[1]{\renewcommand{\@exerciseheadskip}{#1}}
+
+\newcommand{\@exerciseskip}{%
+  \ifthenelse{\value{exercise}=1}%
+  {\par}%
+  {\vspace{\baselineskip}\par}}%
+
+\newcommand{\@exerciselabel}{%
+  \textbf{\@exercisename\ \theexercise}}
+
+\newcommand{\@bonuslabel}{%
+  \textbf{\@bonusname\ \theexercise}}
+
+\newcommand{\@exerciselabelplusskip}{%
+  \@exerciselabel\hspace*{\@exerciseheadskip}}
+
+\newcommand{\@bonuslabelplusskip}{%
+  \@bonuslabel\hspace*{\@exerciseheadskip}}
+
+\newcommand{\@exercisemarks}[1]{%
+  \ifthenelse{\equal{#1}{}}%
+  {}%
+  {\ifthenelse{\equal{#1}{1}}%
+    {(1 Mark)}%
+    {(#1 Marks)}}}%
+
+\newcommand{\@exercisetheme}[1]{%
+  \ifthenelse{\equal{#1}{}}%
+  {}%
+  {\\\phantom{\@exerciselabelplusskip}\textbf{#1}}}%
+
+\newcommand{\@bonustheme}[1]{%
+  \ifthenelse{\equal{#1}{}}%
+  {}%
+  {\\\phantom{\@bonuslabelplusskip}\textbf{#1}}}%
+
 \newcommand{\@exercisehead}[3]{%
-  {\textbf{\@exercisename\ \theexercise\\}}}
+  {\samepage
+    \@exerciselabelplusskip{}#2\ifthenelse{\boolean{marking}}{\hfill\ifthenelse{\equal{#1}{}}{\textbf{Marks
+        not entered}}{\@exercisemarks{#1}}}{}\@exercisetheme{#3}\par\nopagebreak[4]}}
+
+\newcommand{\@bonushead}[3]{%
+  {\samepage
+    \@bonuslabelplusskip{}#2\ifthenelse{\boolean{marking}}{\hfill\ifthenelse{\equal{#1}{}}{\textbf{Marks
+        not entered}}{\@exercisemarks{#1}}}{}\@bonustheme{#3}\par\nopagebreak[4]}}
 
 \newcommand{\@addexercise}[1]{%
   \stepcounter{exercise}%
-  \write\@mainaux{\noexpand\@writefile{loq}{%
-      \noexpand\addtocounter{csenmarktotal}{#1}%
-      \noexpand\addtocounter{marktableexercise}{1}%
-      \noexpand\eaddto{\noexpand\marksrow}{#1&}}}}
+  \ifthenelse{\boolean{marking}}{
+    \ifthenelse{\equal{#1}{}}{%
+      \write\@mainaux{\noexpand\@writefile{loq}{%
+          \noexpand\addtocounter{marktableexercise}{1}%
+          \noexpand\eaddto{\noexpand\marksrow}{?&}}}}
+    {%
+      \write\@mainaux{\noexpand\@writefile{loq}{%
+          \noexpand\addtocounter{csenmarktotal}{#1}%
+          \noexpand\addtocounter{marktableexercise}{1}%
+          \noexpand\eaddto{\noexpand\marksrow}{#1&}}}}}{}}
 
+\newcommand{\@addbonus}[1]{%
+  \stepcounter{exercise}%
+  \ifthenelse{\boolean{marking}}{
+    \ifthenelse{\equal{#1}{}}{%
+      \write\@mainaux{\noexpand\@writefile{loq}{%
+          \noexpand\addtocounter{marktableexercise}{1}%
+          \noexpand\eaddto{\noexpand\marksrow}{Bonus: ?&}}}}
+    {%
+      \write\@mainaux{\noexpand\@writefile{loq}{%
+          \noexpand\addtocounter{marktableexercise}{1}%
+          \noexpand\eaddto{\noexpand\marksrow}{Bonus: #1&}}}}}{}}
 
-\newenvironment{exercise}[1]{%
-  \@addexercise{#1}\@exercisehead
-}%
-{}
+\newenvironment{exercise}[3]{%
+  \@addexercise{#1}\@exerciseskip\@exercisehead{#1}{#2}{#3}}{}
 
+\newenvironment{bonusexercise}[3]{%
+  \@addbonus{#1}\@exerciseskip\@bonushead{#1}{#2}{#3}}{}
 
 
 %----------------------------------------------------------------------%
@@ -304,69 +402,25 @@
 
 %   Searching and loading of config.tex
 \typeout{[newcsen] Searching 'config.tex'}
-\InputIfFileExists{config.tex}{
-  \typeout{[newcsen] File 'config.tex' found in current directory. loading.}
-}
+\InputIfFileExists{config.tex}{%
+  \typeout{[newcsen] File 'config.tex' found in current directory. loading.}}%
 {
-  \InputIfFileExists {../config.tex} {
-    \typeout{[newcsen] File 'config.tex' found in parent directory. loading.}
-  }
+  \InputIfFileExists {../config.tex}{%
+    \typeout{[newcsen] File 'config.tex' found in parent directory. loading.}}%
   {
-    \typeout{[newcsen] File 'config.tex' not found.}
+    \InputIfFileExists {../../config.tex}{%
+      \typeout{[newcsen] File 'config.tex' found in second parent directory. loading.}}%
+    {
+      \typeout{[newcsen] File 'config.tex' not found.}
+    }
   }
 }
 
 
 %----------------------------------------------------------------------%
-%   Layout and headings
+%   Magic (necessary for creating the table of results)
 
-\geometry{paper=a4paper, left=15mm, right=15mm, top=10mm, bottom=5mm,
-  headheight=3\baselineskip, includehead, includefoot}
-\pagestyle{fancy}
-\lhead{\ifthenelse{\boolean{logo}}{
-    \includegraphics[height=.8\headheight]{\@logofile}
-    \hspace*{1mm}
-    \begin{minipage}[b]{.4\linewidth}
-      \small\bfseries \@cseninst\\\@csendpt\\\@csenlecturer
-    \end{minipage}}
-  {\small\bfseries \@cseninst\\\@csendpt\\\@csenlecturer}}
-\chead{}
-\rhead{\ifthenelse{\boolean{logo}}{
-    \begin{minipage}[b]{.4\linewidth}
-      \flushright{\small \@csenclass\\\@csentitle\\\@csenedition}
-    \end{minipage}}
-  {\small \@csenclass\\\@csentitle\\\@csenedition}}
-\lfoot{\bfseries \assessmentnumber}
-\cfoot{}
-\rfoot{Page \thepage/\pageref{lastpage}}
-\renewcommand{\headrulewidth}{0.4pt}
-\renewcommand{\footrulewidth}{0.4pt}
-
-
-%----------------------------------------------------------------------%
-%   Titleline / coverpage
-
-\AtBeginDocument{%
-  \noindent
-  \begin{center}
-    {\Large \bfseries \assessmentnumber}\\[2mm]
-    \ifthenelse{\boolean{subtitle}}{{\large\@csensubtitle\\[2mm]}}{}
-    {\ifthenelse{\equal{\@csendate}{}}{\ifthenelse{\boolean{marking}}{\bfseries\color{red}
-          Define submission date!\\}{}}{%
-    \rule{\linewidth}{2pt}
-    {\ifthenelse{\boolean{marking}}{\bfseries Submission: }{Discussion: }{\@csendate}}
-    \rule{\linewidth}{2pt}}}
-  \end{center}
-}
-
-\AtEndDocument{%
-    \label{lastpage}%
-}
-
-%----------------------------------------------------------------------%
-%   Magic
-
-%   building lines with tab markers
+%   building lines with tab marker symbols
 \def\addto#1#2{%
   \ifx#1\@undefined
     \def#1{#2}%
@@ -387,29 +441,86 @@
 }
 \def\numbersrow{}
 \def\marksrow{}
+\def\emptyrow{}
 
 %----------------------------------------------------------------------%
-%   Table of results (Currently only works at end of file)
+%   Table of results
 
 \newsavebox\@ignore
-\newcommand{\csenmarktable}{%
+\newcommand{\@csenmarktable}{%
   \savebox\@ignore{\@starttoc{loq}}
+  \begin{tabular}{| >{\columncolor[gray]{0.9}}r | *{\value{marktableexercise}}{c |}| c |}
+    \hline
+    \rowcolor[gray]{0.9}\@exercisename
+    \multido{\i=1+1}{\value{marktableexercise}}{\eaddto\numbersrow{&\i}}\numbersrow & $\mathbf{\Sigma}$ \\
+    \hline
+    \rowcolor[gray]{0.9}Possible marks & \marksrow \textbf{\arabic{csenmarktotal}} \\
+    \hline
+    \hline
+    \raisebox{-.75em}{Final marks}
+    \multido{\i=1+1}{\value{marktableexercise}}{\eaddto\emptyrow{&\noexpand\hspace*{2em}}}\emptyrow
+    & \hspace*{3em} \\[1.5em]
+    \hline
+  \end{tabular}}
+
+
+
+%----------------------------------------------------------------------%
+%   Layout and headings
+
+\geometry{paper=a4paper, left=15mm, right=15mm, top=10mm, bottom=5mm,
+  headheight=3\baselineskip, includehead, includefoot}
+\pagestyle{fancy}
+\lhead{\ifthenelse{\boolean{logo}}{
+    \includegraphics[height=.8\headheight]{\@logofile}
+    \hspace*{1mm}
+    \begin{minipage}[b]{.4\linewidth}
+      \small\bfseries\sf \@cseninst\\\@csendpt\\\@csenlecturer
+    \end{minipage}}
+  {\small\bfseries\sf \@cseninst\\\@csendpt\\\@csenlecturer}}
+\chead{}
+\rhead{\ifthenelse{\boolean{logo}}{
+    \begin{minipage}[b]{.4\linewidth}
+      \flushright{\small \@csenclass\\\@csentitle\\\@csenedition}
+    \end{minipage}}
+  {\small \@csenclass\\\@csentitle\\\@csenedition}}
+\lfoot{\bfseries \@assessmentform}
+\cfoot{}
+\rfoot{Page \thepage/\pageref{lastpage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\parindent0pt
+\parskip1\baselineskip
+
+%----------------------------------------------------------------------%
+%   Titleline / coverpage
+
+\AtBeginDocument{%
+  \noindent
   \begin{center}
-    \begin{tabular}{| r || *{\value{marktableexercise}}{c |}| c |}
-      \hline
-      \@exercisename
-      \multido{\i=1+1}{\value{marktableexercise}}{\eaddto\numbersrow{&\i}}\numbersrow & $\mathbf{\Sigma}$ \\
-      \hline
-      Possible marks & \marksrow \textbf{\arabic{csenmarktotal}} \\
-      \hline
-      \hline
-      \raisebox{-.75em}{Final marks}
-      \def\numbersrow{}
-      \multido{\i=1+1}{\value{marktableexercise}}{\eaddto\numbersrow{&\noexpand\hspace*{2em}}}\numbersrow
-      & \hspace*{3em} \\[1.5em]
-      \hline
-    \end{tabular}
-  \end{center}}
+    {\LARGE \bfseries \@assessmentform}\\[2mm]
+    \ifthenelse{\boolean{subtitle}}{{\Large\@csensubtitle\\[2mm]}}{}
+    {\ifthenelse{\equal{\@csendate}{}}{\ifthenelse{\boolean{marking}}{\bfseries\color{red}
+          Define submission date!\\}{}}{%
+    \rule{\linewidth}{2pt}
+    {\ifthenelse{\boolean{marking}}{\bfseries Submission: }{Discussion: }{\@csendate}}
+    \rule{\linewidth}{2pt}}}
+  \end{center}
+  \ifthenelse{\boolean{identity}}{
+    \vspace*{1cm}
+    {\large Name, ID}\dotfill\\[1cm]
+    {\large TA, Group}\dotfill\\}{}
+  \ifthenelse{\boolean{marking}}{
+    \begin{center}
+      \small{Do \textbf{not} write anything into this table!}\\
+      \@csenmarktable
+    \end{center}}{}
+}
+
+\AtEndDocument{%
+    \label{lastpage}%
+}
 
 
 
