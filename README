@@ -12,4 +12,11 @@ Repository started on August 25th, 2011
 newcsen.cls              - new class file to compile course documents
 config.tex               - example file to test the class
 PracticeAssignment01.tex - example file to test the class
+GUC-logo.pdf      	 - PDF vectorized version of the GUC logo (gets loaded with option "logo" unless other file is specified)
+GeorgJung-thumb.png	 - PNG file for testing purposes (can be specified as alternative logo)
 
+Implemented so far:
+- Automatic result table
+- Automatic search for global config file in current and parent directory (might add a level later)
+- options: logo
+- commands: \Institute{} \Department{} \Class{} \Title{} \Lecturer[]{} \Email{} \Logo{} \Topic{} \Date{}
