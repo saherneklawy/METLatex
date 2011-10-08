@@ -18,8 +18,13 @@ GeorgJung-thumb.png	 - PNG file for testing purposes (can be specified as altern
 Implemented so far:
 - Automatic result table
 - Automatic search for global config file in current and parent and parent of parent directory
-- options: logo
-- commands: \Institute{} \Department{} \Class{} \Title{} \Lecturer[]{} \Email{} \Logo{} \Topic{} \Date{}
+- options: all
+- commands: \Institute{} \Department{} \Class{} \Title{} \Lecturer[]{} \Email{} \Logo{} \Topic{} \Date{} and more
 - exercise environment
 - bonusexercise environment
 - options practice (default) and assignment usable now
+- scratch paper generator
+
+To do:
+- Cover pages
+- Exercise distance in exams

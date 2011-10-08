@@ -7,7 +7,7 @@
 %   Department for Media Engineering and Technology
 %   Fall 2011
 
-\def\fileversion{v0.1}
+\def\fileversion{v0.3}
 \def\filedate{2011/09/20}
 
 %----------------------------------------------------------------------%
@@ -17,8 +17,11 @@
 \typeout{NewCSEN: \fileversion\ <\filedate> (Georg Jung)}
 %----------------------------------------------------------------------%
 
+%----------------------------------------------------------------------%
 %   Document class options:
+
 %     solution   - show solution
+
 %     practice   - compile a practice assignment
 %     assignment - compile an assignment
 %     popquiz    - compile a popquiz
@@ -27,37 +30,66 @@
 %     midterm    - compile the midterm exam
 %     final      - compile the final exam
 %     makeup     - compile the makeup exam
+
 %     logo       - add a logo to the output
+
+%     nomarktbl  - suppress marking table on first page
+%                  (for marked assessments)
+%     noid       - suppress student identification form
+%                  (e.g., for computerized assessments)
+%     nonumber   - suppress numbering
 
 %----------------------------------------------------------------------%
 %   Commands for config.tex
 
-%   \Institute{}   - sets the institute (defaults to "The German University in Cairo")
-%   \Department{}  - sets the department (defaults to "Dpt. for Media Engineering and Technology")
-%   \Class{}       - sets the class code
-%   \Title{}       - sets the title of the class
-%   \Lecturer[]{}  - sets the class lecturer (optional short name)
-%   \Email{}       - sets the e-mail address of the lecturer
-%   \Logo{}        - sets the name of an image file that contains a logo (defaults to "GUC-logo")
+%   \Institute{}       - sets the institute
+%                        (defaults to "The German University in Cairo")
+%   \Department{}      - sets the department
+%                        (defaults to "Dpt. for Media Engineering and
+%                        Technology")
+%   \Class{}           - sets the class code
+%   \Title{}           - sets the title of the class
+%   \Edition{}         - sets the semester for this class
+%   \Lecturer[]{}      - sets the class lecturer (optional short name)
+%   \Email{}           - sets the e-mail address of the lecturer
+%   \Logo{}            - sets the name of an image file that contains
+%                        a logo (defaults to "GUC-logo")
 
 %----------------------------------------------------------------------%
 %   Commands for individual files
 
-%   \Topic{}       - sets the topic of the exercise set
-%   \Date{}        - sets the discussion/submission/exam date
+%   \Assessmenttype{}  - sets an individual assessment type if
+%                        necessary (e.g. "Practical Assignment",
+%                        usually set through appropriate option)
+%   \Number{}          - sets the number of this assessment (usually
+%                        set automatically from filename)
+%   \Topic{}           - sets the topic of the exercise set
+%   \Version{}         - sets the version number, necessary if
+%                        multiple versions are prepared
+%   \Date{}            - sets the discussion/submission/exam date
+%   \Pages             - returns the total number of pages
+%   \Scratchpaper{}    - sets the number of pages for jotting paper in
+%                        the end (defaults to three for marked exam
+%                        types, zero otherwise)
+%   \Scratchpages      - returns the number of pages for jotting paper
+%                        in the end
 
 %----------------------------------------------------------------------%
 %   Commands for inofficial use only
 
-%   \Exercisename{}       - Sets a name for the exercise header (default: Exercise)
-%   \Bonusname{}          - Sets a name for the bonus exercise header (default: Bonus Exercise)
-%   \Exerciseheadskip{}   - Sets a distance between number, theme and title
+%   \Exercisename{}       - Sets a name for the exercise header
+%                           (default: Exercise)
+%   \Bonusname{}          - Sets a name for the bonus exercise header
+%                           (default: Bonus Exercise)
+%   \Exerciseheadskip{}   - Sets a distance between number, theme and
+%                           title
 
 %----------------------------------------------------------------------%
 %   Environments
 
-%   \begin{exercise}{Marks}{Theme}{Title} ... \end{exercise}
-%   \begin{bonusexercise}{Marks}{Theme}{Title} ... \end{bonusexercise}
+%   \begin{exercise}{<marks>}{<theme>}{<title>} ... \end{exercise}
+%   \begin{bonusexercise}{<marks>}{<theme>}{<title>} ... \end{bonusexercise}
+%   \begin{solution} ... \end{solution}
 
 %======================================================================%
 
@@ -65,14 +97,16 @@
 %   Required packages
 
 \RequirePackage[utf8]{inputenx}
-\RequirePackage{ifthen}
+\RequirePackage[a4paper]{geometry}
+\RequirePackage{xifthen}
+\RequirePackage{verbatim}
+\RequirePackage{multido}
 \RequirePackage{graphicx}
 \RequirePackage{color}
 \RequirePackage{fancyhdr}
-\RequirePackage{multido}
 \RequirePackage{colortbl}
-\RequirePackage[a4paper]{geometry}
 
+%----------------------------------------------------------------------%
 \makeatletter
 
 %----------------------------------------------------------------------%
@@ -97,8 +131,11 @@
 \newboolean{identity}%     - A form for name and tutorial is generated
 \newboolean{marking}%      - The assessment is marked (no practice, no mock)
 \newboolean{logo}%         - A logo is printed on each left header
+\newboolean{nomarktbl}%    - Supresses the marking table if true
 
 \newcommand{\@csenassessmenttitle}{Practice assignment}
+\newcommand{\Assessmenttype}[1]{\renewcommand{\@csenassessmenttitle}{#1}}
+
 \setboolean{practice}{true}%
 \setboolean{numbered}{true}%
 \setboolean{assignment}{false}%
@@ -112,7 +149,6 @@
 \setboolean{cover}{false}%
 \setboolean{marking}{false}%
 
-\DeclareOption{solution}{\setboolean{solution}{true}}%
 \DeclareOption{practice}{\setboolean{practice}{true}%
   \setboolean{numbered}{true}%
   \setboolean{assignment}{false}%
@@ -218,8 +254,19 @@
   \setboolean{marking}{true}%
   \renewcommand{\@csenassessmenttitle}{Makeup exam}}%
 
+\DeclareOption{solution}{\setboolean{solution}{true}
+  \setboolean{nomarktbl}{true}
+  \setboolean{identity}{false}}%
+
 \setboolean{logo}{false}%
 \DeclareOption{logo}{\setboolean{logo}{true}}%
+
+\DeclareOption{noid}{\setboolean{identity}{false}}%
+
+\DeclareOption{nonumber}{\setboolean{numbered}{false}}%
+
+\setboolean{nomarktbl}{false}%
+\DeclareOption{nomarktbl}{\setboolean{nomarktbl}{true}}%
 
 \DeclareOption{10pt}{\PassOptionsToClass{10pt}{article}}%
 \DeclareOption{11pt}{\PassOptionsToClass{11pt}{article}}%
@@ -228,7 +275,6 @@
 \ProcessOptions
 
 \LoadClass[pdftex,a4paper]{article}
-
 
 %----------------------------------------------------------------------%
 %   Variables and commands
@@ -263,6 +309,32 @@
 \newcommand{\@csensubtitle}{}
 \newcommand{\Topic}[1]{\setboolean{subtitle}{true}\renewcommand\@csensubtitle{#1}}
 
+\newcommand{\@csenversion}{}
+\newcommand{\Version}[1]{\renewcommand{\@csenversion}{#1}}
+
+\newcounter{scratchpages}
+\setcounter{scratchpages}{0}
+\newcommand{\Scratchpages}{\arabic{scratchpages}}
+\newcommand{\Scratchpaper}[1]{\setcounter{scratchpages}{#1}}
+
+\newcounter{@scratchpage}
+\setcounter{@scratchpage}{0}
+
+\newcommand{\@mkscratch}%
+{\multido{\i=1+1}{\value{scratchpages}}{\newpage%
+    \lhead{}%
+    \chead{\large\textbf{Scratch paper sheet \arabic{@scratchpage}}}%
+    \rhead{}%
+    \lfoot{\@csenclass\ (\@csenedition)}%
+    \cfoot{\textbf{\@assessmentform,\ \@csendate}}%
+    \begin{center}
+      \rule{\linewidth}{1pt}\\
+      \raisebox{-.25\baselineskip}{contents of the scratch paper will
+        not be graded unless a reference on the problem page indicates
+        that a solution extends here}\\
+      \rule{\linewidth}{1pt}
+    \end{center}\stepcounter{@scratchpage}}}
+\newcommand{\Pages}{\pageref{lastpage}}
 
 %----------------------------------------------------------------------%
 %   Counters
@@ -278,14 +350,15 @@
 
 \newcounter{exercise}
 \setcounter{exercise}{0}
-\renewcommand{\theexercise}{\ifthenelse{\boolean{numbered}}{\theassessment--}{}\arabic{exercise}}
+\renewcommand{\theexercise}{\ifthenelse{\boolean{numbered}}{\theassessment}{}%
+  \ifthenelse{\equal{\@csenversion}{}}{}{(\@csenversion)}%
+  \ifthenelse{\boolean{numbered}}{--}{}\arabic{exercise}}%
 
 \newcounter{marktableexercise}
 \setcounter{marktableexercise}{0}
 
 \newcounter{csenmarktotal}
 \setcounter{csenmarktotal}{0}
-
 
 %----------------------------------------------------------------------%
 %   Environments
@@ -337,12 +410,12 @@
 \newcommand{\@exercisehead}[3]{%
   {\samepage
     \@exerciselabelplusskip{}#2\ifthenelse{\boolean{marking}}{\hfill\ifthenelse{\equal{#1}{}}{\textbf{Marks
-        not entered}}{\@exercisemarks{#1}}}{}\@exercisetheme{#3}\par\nopagebreak[4]}}
+        not specified}}{\@exercisemarks{#1}}}{}\@exercisetheme{#3}\par\nopagebreak[4]}}
 
 \newcommand{\@bonushead}[3]{%
   {\samepage
     \@bonuslabelplusskip{}#2\ifthenelse{\boolean{marking}}{\hfill\ifthenelse{\equal{#1}{}}{\textbf{Marks
-        not entered}}{\@exercisemarks{#1}}}{}\@bonustheme{#3}\par\nopagebreak[4]}}
+        not specified}}{\@exercisemarks{#1}}}{}\@bonustheme{#3}\par\nopagebreak[4]}}
 
 \newcommand{\@addexercise}[1]{%
   \stepcounter{exercise}%
@@ -375,6 +448,21 @@
 \newenvironment{bonusexercise}[3]{%
   \@addbonus{#1}\@exerciseskip\@bonushead{#1}{#2}{#3}}{}
 
+%   Solution
+
+\newcommand{\solutionskip}{%
+  \vspace{\baselineskip}\par}
+
+\newcommand{\solutionheading}{%
+  {\samepage\textbf{Solution:}\par\nopagebreak[4]}}
+
+\newenvironment{solution}%
+{\ifthenelse{\boolean{solution}}%
+  {\solutionskip\solutionheading}%
+    {\comment}}%
+{\ifthenelse{\boolean{solution}}%
+  {}%
+{\endcomment}}
 
 %----------------------------------------------------------------------%
 %   Convenient automatic functions by Igor Akkerman
@@ -415,7 +503,6 @@
     }
   }
 }
-
 
 %----------------------------------------------------------------------%
 %   Magic (necessary for creating the table of results)
@@ -463,8 +550,6 @@
     \hline
   \end{tabular}}
 
-
-
 %----------------------------------------------------------------------%
 %   Layout and headings
 
@@ -501,29 +586,47 @@
   \begin{center}
     {\LARGE \bfseries \@assessmentform}\\[2mm]
     \ifthenelse{\boolean{subtitle}}{{\Large\@csensubtitle\\[2mm]}}{}
+    \ifthenelse{\equal{\@csenversion}{}}{}{{\large ---\ Version\ \@csenversion\ ---\\[2mm]}}
     {\ifthenelse{\equal{\@csendate}{}}{\ifthenelse{\boolean{marking}}{\bfseries\color{red}
           Define submission date!\\}{}}{%
-    \rule{\linewidth}{2pt}
-    {\ifthenelse{\boolean{marking}}{\bfseries Submission: }{Discussion: }{\@csendate}}
-    \rule{\linewidth}{2pt}}}
+        \rule{\linewidth}{2pt}
+        \raisebox{-.25\baselineskip}{%
+          \ifthenelse{\boolean{solution}}{\bfseries Model Solutions}%
+          {\ifthenelse{\boolean{marking}}{\bfseries Submission: }{Discussion: }{\@csendate}}}
+        \rule{\linewidth}{2pt}}}
   \end{center}
   \ifthenelse{\boolean{identity}}{
     \vspace*{1cm}
-    {\large Name, ID}\dotfill\\[1cm]
-    {\large TA, Group}\dotfill\\}{}
-  \ifthenelse{\boolean{marking}}{
-    \begin{center}
-      \small{Do \textbf{not} write anything into this table!}\\
-      \@csenmarktable
-    \end{center}}{}
+    {\large Name}\dotfill%
+    \begin{tabular}[b]{|r|*{7}{p{1.5em}|}}
+      \hline
+      \raisebox{-.75em}{Student ID \#} & & &
+      \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{---}}}
+      & & & & \\[1.5em]
+      \hline
+    \end{tabular}%
+    \\[1cm]
+    {\large Name of your TA}\dotfill%
+    \begin{tabular}[b]{|r|*{4}{p{1.5em}|}}
+      \hline
+      \raisebox{-.75em}{Group \#} &
+      \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{T}}} &
+      \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{---}}} & & \\[1.5em]
+      \hline
+    \end{tabular}%
+    \\}{}
+  \ifthenelse{\boolean{marking}}{\ifthenelse{\boolean{nomarktbl}}{}{
+      \vspace*{2cm}
+      \begin{center}
+        \small{Do \textbf{not} write anything into this table!}\\
+        \@csenmarktable
+      \end{center}\vspace*{2cm}}}{}
 }
 
 \AtEndDocument{%
-    \label{lastpage}%
+  \@mkscratch
+  \label{lastpage}%
 }
-
-
-
 
 %----------------------------------------------------------------------%
 \makeatother
