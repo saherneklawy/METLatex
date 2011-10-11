@@ -14,6 +14,7 @@ config.tex               - example file to test the class
 PracticeAssignment01.tex - example file to test the class
 GUC-logo.pdf      	 - PDF vectorized version of the GUC logo (gets loaded with option "logo" unless other file is specified)
 GeorgJung-thumb.png	 - PNG file for testing purposes (can be specified as alternative logo)
+FExtinguish.pdf          - Another logo to test the scaling
 
 Implemented so far:
 - Automatic result table
@@ -24,7 +25,10 @@ Implemented so far:
 - bonusexercise environment
 - options practice (default) and assignment usable now
 - scratch paper generator
+- cover pages
+- spacing
 
 To do:
-- Cover pages
-- Exercise distance in exams
+- testing
+- cleanup (consistently prefix variable names and booleans, tighten code)
+- better collecting mechanism for formulas for the formula sheet (capable of specifying displaymath)

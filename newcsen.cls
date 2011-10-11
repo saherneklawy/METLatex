@@ -91,6 +91,8 @@
 %                        (optional title)
 %   \SolutionSpace{}   - sets a space to be left for the solution if
 %                        the solution is not shown
+%   \Mark{}            - set marks for sub-exercises (no checks, no
+%                        automatic adding! only typesetting)
 
 %----------------------------------------------------------------------%
 %   Commands for unofficial use only
@@ -493,6 +495,11 @@
   {\ifthenelse{\equal{#1}{1}}%
     {(1 Mark)}%
     {(#1 Marks)}}}%
+
+\renewcommand{\labelenumi}{(\alph{enumi})}
+
+\newcommand{\Mark}[1]{\hspace*{\stretch{1}}{\@exercisemarks{#1}}}
+\newcommand{\Bonus}[1]{\hspace*{\stretch{1}}{\textbf{\@exercisemarks{#1}}}}
 
 \newcommand{\@exercisetheme}[1]{%
   \ifthenelse{\equal{#1}{}}%
