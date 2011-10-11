@@ -7,7 +7,7 @@
 %   Department for Media Engineering and Technology
 %   Fall 2011
 
-\def\fileversion{v0.3}
+\def\fileversion{v1.0beta}
 \def\filedate{2011/09/20}
 
 %----------------------------------------------------------------------%
@@ -37,7 +37,16 @@
 %                  (for marked assessments)
 %     noid       - suppress student identification form
 %                  (e.g., for computerized assessments)
+%     nobarcode  - suppress barcode placeholder (e.g., for
+%                  computerized assessments)
+%     idform     - print student id-form on cover page instead of
+%                  barcode
 %     nonumber   - suppress numbering
+%     coverpage  - generate a cover page (default for quiz, mock exam,
+%                  midterm, final, and makeup)
+%     nocover    - do not generate a cover page (default for practice
+%                  assignment, assignment, popquiz)
+%     noinstruct - suppress instructions on cover page
 
 %----------------------------------------------------------------------%
 %   Commands for config.tex
@@ -73,9 +82,18 @@
 %                        types, zero otherwise)
 %   \Scratchpages      - returns the number of pages for jotting paper
 %                        in the end
+%   \Duration{}        - sets the duration of the exam (defaults to
+%                        120 min for midterm and 180 min for final and
+%                        makeup)
+%   \Instructions{}    - sets instructions other than the default for
+%                        this exam
+%   \AddFormula[]{}    - adds a formula for the formula sheet
+%                        (optional title)
+%   \SolutionSpace{}   - sets a space to be left for the solution if
+%                        the solution is not shown
 
 %----------------------------------------------------------------------%
-%   Commands for inofficial use only
+%   Commands for unofficial use only
 
 %   \Exercisename{}       - Sets a name for the exercise header
 %                           (default: Exercise)
@@ -83,6 +101,7 @@
 %                           (default: Bonus Exercise)
 %   \Exerciseheadskip{}   - Sets a distance between number, theme and
 %                           title
+%   \Exerciseskip{}       - Sets the distance between two exercises
 
 %----------------------------------------------------------------------%
 %   Environments
@@ -131,10 +150,40 @@
 \newboolean{identity}%     - A form for name and tutorial is generated
 \newboolean{marking}%      - The assessment is marked (no practice, no mock)
 \newboolean{logo}%         - A logo is printed on each left header
-\newboolean{nomarktbl}%    - Supresses the marking table if true
+\newboolean{nomarktbl}%    - Suppresses the marking table if true
+\newboolean{nobarcode}%    - Suppress printing of a barcode placeholder
+\newboolean{noinstruct}%   - Suppress printing of instructions on cover page
+\newboolean{formula}%      - Assessment contains a formula sheet
+
+%----------------------------------------------------------------------%
+%   Counters
+
+\newcounter{assessment}
+\setcounter{assessment}{1}
+
+\newcounter{exercise}
+\setcounter{exercise}{0}
+
+\newcounter{marktableexercise}
+\setcounter{marktableexercise}{0}
+
+\newcounter{csenmarktotal}
+\setcounter{csenmarktotal}{0}
+
+\newcounter{scratchpages}
+\setcounter{scratchpages}{0}
+
+\newcounter{@scratchpage}
+\setcounter{@scratchpage}{0}
+
+%----------------------------------------------------------------------%
+%   Options
 
 \newcommand{\@csenassessmenttitle}{Practice assignment}
 \newcommand{\Assessmenttype}[1]{\renewcommand{\@csenassessmenttitle}{#1}}
+
+\newcommand{\@csenduration}{}
+\newcommand{\Duration}[1]{\renewcommand{\@csenduration}{#1}}
 
 \setboolean{practice}{true}%
 \setboolean{numbered}{true}%
@@ -148,6 +197,9 @@
 \setboolean{identity}{false}%
 \setboolean{cover}{false}%
 \setboolean{marking}{false}%
+\setboolean{nobarcode}{false}%
+\setboolean{noinstruct}{false}%
+\setboolean{formula}{false}%
 
 \DeclareOption{practice}{\setboolean{practice}{true}%
   \setboolean{numbered}{true}%
@@ -198,7 +250,7 @@
   \setboolean{final}{false}%
   \setboolean{makeup}{false}
   \setboolean{identity}{true}%
-  \setboolean{cover}{true}%
+  \setboolean{cover}{false}%
   \setboolean{marking}{true}%
   \renewcommand{\@csenassessmenttitle}{Quiz}}%
 \DeclareOption{mock}{\setboolean{mock}{true}%
@@ -225,7 +277,9 @@
   \setboolean{makeup}{false}
   \setboolean{identity}{false}%
   \setboolean{cover}{true}%
-  \setboolean{marking}{false}%
+  \setboolean{marking}{true}%
+  \setcounter{scratchpages}{3}%
+  \renewcommand{\@csenduration}{120 minutes}%
   \renewcommand{\@csenassessmenttitle}{Midterm exam}}%
 \DeclareOption{final}{\setboolean{final}{true}%
   \setboolean{numbered}{false}%
@@ -239,6 +293,8 @@
   \setboolean{identity}{false}%
   \setboolean{cover}{true}%
   \setboolean{marking}{true}%
+  \setcounter{scratchpages}{3}%
+  \renewcommand{\@csenduration}{180 minutes}%
   \renewcommand{\@csenassessmenttitle}{Final exam}}%
 \DeclareOption{makeup}{\setboolean{makeup}{true}%
   \setboolean{numbered}{false}%
@@ -252,6 +308,8 @@
   \setboolean{identity}{false}%
   \setboolean{cover}{true}%
   \setboolean{marking}{true}%
+  \setcounter{scratchpages}{3}%
+  \renewcommand{\@csenduration}{180 minutes}%
   \renewcommand{\@csenassessmenttitle}{Makeup exam}}%
 
 \DeclareOption{solution}{\setboolean{solution}{true}
@@ -268,6 +326,17 @@
 \setboolean{nomarktbl}{false}%
 \DeclareOption{nomarktbl}{\setboolean{nomarktbl}{true}}%
 
+\DeclareOption{coverpage}{\setboolean{cover}{true}}%
+\DeclareOption{nocover}{\setboolean{cover}{false}}%
+
+\DeclareOption{nobarcode}{\setboolean{nobarcode}{true}}%
+
+\DeclareOption{idform}{\setboolean{identity}{true}}%
+
+\DeclareOption{noinstruct}{\setboolean{noinstruct}{true}}%
+
+\DeclareOption{formula}{\setboolean{formula}{true}}%
+
 \DeclareOption{10pt}{\PassOptionsToClass{10pt}{article}}%
 \DeclareOption{11pt}{\PassOptionsToClass{11pt}{article}}%
 \DeclareOption{12pt}{\PassOptionsToClass{12pt}{article}}%
@@ -278,6 +347,25 @@
 
 %----------------------------------------------------------------------%
 %   Variables and commands
+
+\newcommand{\@csendate}{}
+\newcommand{\Date}[1]{\renewcommand{\@csendate}{#1}}
+
+\renewcommand{\theassessment}{\arabic{assessment}}
+\newcommand{\@assessmentform}{\@csenassessmenttitle\ifthenelse{\boolean{numbered}}{\ \theassessment}{}}
+\newcommand{\Number}[1]{\setcounter{assessment}{#1}}
+
+\renewcommand{\theexercise}{\ifthenelse{\boolean{numbered}}{\theassessment}{}%
+  \ifthenelse{\equal{\@csenversion}{}}{}{(\@csenversion)}%
+  \ifthenelse{\boolean{numbered}}{--}{}\arabic{exercise}}%
+
+\newcommand{\@spelled}[2][u]{%
+  \ifthenelse{\equal{#1}{l}}%
+  {\ifcase#2\or{one}\or{two}\or{three}\or{four}\or{five}\or{six}\or{seven}\or{eight}\or{nine}\or{ten}\or{eleven}\or{Twelve}\else\@ctrerr\fi}
+  {\ifcase#2\or{One}\or{Two}\or{Three}\or{Four}\or{Five}\or{Six}\or{Seven}\or{Eight}\or{Nine}\or{Ten}\or{Eleven}\or{Twelve}\else\@ctrerr\fi}}
+
+\newcommand{\@scratchspelled}[1][u]{%
+  \ifthenelse{\value{scratchpages}>12}{\arabic{scratchpages}}{\@spelled[#1]{\value{scratchpages}}}}
 
 \newcommand{\@cseninst}{The German University in Cairo}
 \newcommand{\Institute}[1]{\renewcommand{\@csendpt}{#1}}
@@ -312,21 +400,12 @@
 \newcommand{\@csenversion}{}
 \newcommand{\Version}[1]{\renewcommand{\@csenversion}{#1}}
 
-\newcounter{scratchpages}
-\setcounter{scratchpages}{0}
 \newcommand{\Scratchpages}{\arabic{scratchpages}}
 \newcommand{\Scratchpaper}[1]{\setcounter{scratchpages}{#1}}
 
-\newcounter{@scratchpage}
-\setcounter{@scratchpage}{0}
-
 \newcommand{\@mkscratch}%
 {\multido{\i=1+1}{\value{scratchpages}}{\newpage%
-    \lhead{}%
-    \chead{\large\textbf{Scratch paper sheet \arabic{@scratchpage}}}%
-    \rhead{}%
-    \lfoot{\@csenclass\ (\@csenedition)}%
-    \cfoot{\textbf{\@assessmentform,\ \@csendate}}%
+    \thispagestyle{scratch}
     \begin{center}
       \rule{\linewidth}{1pt}\\
       \raisebox{-.25\baselineskip}{contents of the scratch paper will
@@ -334,31 +413,47 @@
         that a solution extends here}\\
       \rule{\linewidth}{1pt}
     \end{center}\stepcounter{@scratchpage}}}
+
 \newcommand{\Pages}{\pageref{lastpage}}
 
-%----------------------------------------------------------------------%
-%   Counters
+\newcommand{\SolutionSpace}[1]{%
+  \ifthenelse{\boolean{solution}}{}{\vspace*{#1}}}
 
-\newcommand{\@csendate}{}
-\newcommand{\Date}[1]{\renewcommand{\@csendate}{#1}}
+\newcommand{\@cseninstructions}{%
+    \begin{enumerate}
+      \ifthenelse{\equal{\@csenduration}{}}{}{
+      \item The duration of this exam is \textbf{\@csenduration}.}
+    \item Non-programmable calculators are allowed
+    \item No books or other aids are permitted for this test.
+    \item This exam booklet contains a total of \textbf{\Pages\
+        pages}, including this one.
+      \ifthenelse{\value{scratchpages}>0}{\@scratchspelled\ extra
+        sheets of scratch paper are attached and have to be kept
+        attached.}{}
+      \ifthenelse{\boolean{formula}}{A fomula sheet is attached and
+        may be detached for convenience
+        (page~\pageref{formulapage}). The formula sheet does not need
+        to be submitted.}{}
+      \textbf{Note that if one or more pages are missing, you will
+        lose their points. Thus, you must check that your exam booklet
+        is complete.}
+    \item Write your solutions in the space provided. If you need more
+      space, write on the back of the sheet containing the
+      problem\ifthenelse{\value{scratchpages}>0}{ or on the
+      \@scratchspelled[l]\ extra sheets and indicate that clearly on
+      the problem page. \textbf{Scratch sheets will not be graded
+        unless a reference on the problem page indicates that the
+        solution extends to the scratch sheets.}}{.}
+    \item When you are told that time is up, stop working on the test.
+    \end{enumerate}}
+\newcommand{\Instructions}[1]{\renewcommand{\@cseninstructions}{#1}}
 
-\newcounter{assessment}
-\setcounter{assessment}{1}
-\renewcommand{\theassessment}{\arabic{assessment}}
-\newcommand{\@assessmentform}{\@csenassessmenttitle\ifthenelse{\boolean{numbered}}{\ \theassessment}{}}
-\newcommand{\Number}[1]{\setcounter{assessment}{#1}}
-
-\newcounter{exercise}
-\setcounter{exercise}{0}
-\renewcommand{\theexercise}{\ifthenelse{\boolean{numbered}}{\theassessment}{}%
-  \ifthenelse{\equal{\@csenversion}{}}{}{(\@csenversion)}%
-  \ifthenelse{\boolean{numbered}}{--}{}\arabic{exercise}}%
-
-\newcounter{marktableexercise}
-\setcounter{marktableexercise}{0}
-
-\newcounter{csenmarktotal}
-\setcounter{csenmarktotal}{0}
+\newcommand{\AddFormula}[2][]{%
+  \ifthenelse{\equal{#1}{}}{%
+    \write\@mainaux{\noexpand\@writefile{for}{%
+        \noexpand\item[$\bullet$]\noexpand~\noexpand\\\noexpand{#2}}}}
+  {\write\@mainaux{\noexpand\@writefile{for}{%
+        \noexpand\item[#1]\noexpand~\noexpand\\\noexpand{#2}}}}}
 
 %----------------------------------------------------------------------%
 %   Environments
@@ -376,7 +471,9 @@
 \newcommand{\@exerciseskip}{%
   \ifthenelse{\value{exercise}=1}%
   {\par}%
-  {\vspace{\baselineskip}\par}}%
+  {\ifthenelse{\boolean{mock} \OR \boolean{midterm} \OR \boolean{final} \OR \boolean{makeup}}%
+    {\newpage}{\vspace{\baselineskip}\par}}}%
+\newcommand{\Exerciseskip}[1]{\renewcommand{\@exerciseskip}{#1}}
 
 \newcommand{\@exerciselabel}{%
   \textbf{\@exercisename\ \theexercise}}
@@ -449,7 +546,6 @@
   \@addbonus{#1}\@exerciseskip\@bonushead{#1}{#2}{#3}}{}
 
 %   Solution
-
 \newcommand{\solutionskip}{%
   \vspace{\baselineskip}\par}
 
@@ -551,6 +647,59 @@
   \end{tabular}}
 
 %----------------------------------------------------------------------%
+%   Formula sheet
+
+\newcommand{\@mkformula}%
+{\newpage%
+  \thispagestyle{formula}
+  \label{formulapage}
+  \begin{center}
+    \rule{\linewidth}{1pt}\\
+    \raisebox{-.25\baselineskip}{The formula sheet can be detached for
+    convenience. It does not have to be submitted.}\\
+    \rule{\linewidth}{1pt}
+  \end{center}
+  \begin{description}
+    \item[\large Formulas:]~
+    \@starttoc{for}
+  \end{description}}
+
+
+%----------------------------------------------------------------------%
+%   Identity
+
+\newcommand{\@csenidentity}{%
+  \vspace*{1cm}
+  {\large Name}\dotfill%
+  \begin{tabular}[b]{|r|*{7}{p{1.5em}|}}
+    \hline
+    \raisebox{-.75em}{Student ID \#} & & &
+    \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{---}}}
+    & & & & \\[1.5em]
+    \hline
+  \end{tabular}%
+  \\[1cm]
+  {\large Name of your TA}\dotfill%
+  \begin{tabular}[b]{|r|*{4}{p{1.5em}|}}
+    \hline
+    \raisebox{-.75em}{Group \#} &
+    \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{T}}} &
+    \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{---}}} & & \\[1.5em]
+    \hline
+  \end{tabular}%
+  \\}
+
+\newcommand{\@barcodebox}{%
+  \fbox{%
+    \begin{minipage}{10cm}
+      \vspace*{30mm}
+      \begin{flushright}
+        {\small\textbf{Barcode}}
+      \end{flushright}
+    \end{minipage}}}
+
+
+%----------------------------------------------------------------------%
 %   Layout and headings
 
 \geometry{paper=a4paper, left=15mm, right=15mm, top=10mm, bottom=5mm,
@@ -575,6 +724,26 @@
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \rfoot{Page \thepage/\pageref{lastpage}}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0.4pt}}
+
+\fancypagestyle{scratch}{
+  \lhead{}%
+  \chead{\large\textbf{Scratch paper sheet \arabic{@scratchpage}}}%
+  \rhead{}%
+  \lfoot{\@csenclass\ (\@csenedition)}%
+  \cfoot{\textbf{\@assessmentform,\ \@csendate}}}%
+
+\fancypagestyle{formula}{
+  \lhead{}%
+  \chead{\large\textbf{Formula sheet}}%
+  \rhead{}%
+  \lfoot{\@csenclass\ (\@csenedition)}%
+  \cfoot{\textbf{\@assessmentform,\ \@csendate}}}%
+
 \parindent0pt
 \parskip1\baselineskip
 
@@ -582,49 +751,67 @@
 %   Titleline / coverpage
 
 \AtBeginDocument{%
-  \noindent
-  \begin{center}
-    {\LARGE \bfseries \@assessmentform}\\[2mm]
-    \ifthenelse{\boolean{subtitle}}{{\Large\@csensubtitle\\[2mm]}}{}
-    \ifthenelse{\equal{\@csenversion}{}}{}{{\large ---\ Version\ \@csenversion\ ---\\[2mm]}}
-    {\ifthenelse{\equal{\@csendate}{}}{\ifthenelse{\boolean{marking}}{\bfseries\color{red}
-          Define submission date!\\}{}}{%
-        \rule{\linewidth}{2pt}
-        \raisebox{-.25\baselineskip}{%
-          \ifthenelse{\boolean{solution}}{\bfseries Model Solutions}%
-          {\ifthenelse{\boolean{marking}}{\bfseries Submission: }{Discussion: }{\@csendate}}}
-        \rule{\linewidth}{2pt}}}
-  \end{center}
-  \ifthenelse{\boolean{identity}}{
-    \vspace*{1cm}
-    {\large Name}\dotfill%
-    \begin{tabular}[b]{|r|*{7}{p{1.5em}|}}
-      \hline
-      \raisebox{-.75em}{Student ID \#} & & &
-      \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{---}}}
-      & & & & \\[1.5em]
-      \hline
-    \end{tabular}%
-    \\[1cm]
-    {\large Name of your TA}\dotfill%
-    \begin{tabular}[b]{|r|*{4}{p{1.5em}|}}
-      \hline
-      \raisebox{-.75em}{Group \#} &
-      \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{T}}} &
-      \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{---}}} & & \\[1.5em]
-      \hline
-    \end{tabular}%
-    \\}{}
-  \ifthenelse{\boolean{marking}}{\ifthenelse{\boolean{nomarktbl}}{}{
-      \vspace*{2cm}
-      \begin{center}
-        \small{Do \textbf{not} write anything into this table!}\\
-        \@csenmarktable
-      \end{center}\vspace*{2cm}}}{}
-}
+  \ifthenelse{\boolean{cover}}{%
+    \thispagestyle{plain}
+    \noindent
+    \ifthenelse{\boolean{logo}}{%
+      \includegraphics[height=3\baselineskip]{\@logofile}\hspace*{1mm}}{}
+    \begin{minipage}[b]{.5\linewidth}
+      \bfseries\sf \@cseninst\\\@csendpt\\\@csenlecturer
+    \end{minipage}
+    \hspace*{\stretch{1}}
+    \begin{minipage}[b]{.2\linewidth}
+      \flushright{\@csendate}\\~\\~
+    \end{minipage}
+    \vspace*{3\baselineskip}
+    \begin{center}
+      \textbf{\LARGE\@csenclass: \@csentitle\\[5mm]}
+      \textbf{\Large\@csenedition\\[5mm]}
+      {\Large \@assessmentform\\[1cm]}
+      \ifthenelse{\boolean{marking}}{%
+        \ifthenelse{\boolean{identity}}{\@csenidentity}{%
+          \ifthenelse{\boolean{nobarcode}}{}{\@barcodebox}}}{}
+    \end{center}
+    \ifthenelse{\boolean{noinstruct}{}}{}{%
+      \textbf{Instructions. Please read carefully before proceeding.}
+      \@cseninstructions}
+    \begin{center}
+      \textbf{\large Good luck!}
+    \end{center}
+    \vspace*{\stretch{1}}
+    \ifthenelse{\boolean{marking}}{\ifthenelse{\boolean{nomarktbl}}{}{
+    \rule{\linewidth}{3pt}\\
+    Do not write anything below this line.
+    \begin{center}
+      \@csenmarktable
+    \end{center}}}{}
+    \pagebreak
+  }{%
+    \noindent
+    \begin{center}
+      {\LARGE \bfseries \@assessmentform}\\[2mm]
+      \ifthenelse{\boolean{subtitle}}{{\Large\@csensubtitle\\[2mm]}}{}
+      \ifthenelse{\equal{\@csenversion}{}}{}{{\large ---\ Version\ \@csenversion\ ---\\[2mm]}}
+      {\ifthenelse{\equal{\@csendate}{}}{\ifthenelse{\boolean{marking}}{\bfseries\color{red}
+            Define submission date!\\}{}}{%
+          \rule{\linewidth}{2pt}
+          \raisebox{-.25\baselineskip}{%
+            \ifthenelse{\boolean{solution}}{\bfseries Model Solutions}%
+            {\ifthenelse{\boolean{marking}}{\bfseries Submission: }{Discussion: }{\@csendate}}}
+          \rule{\linewidth}{2pt}}}
+    \end{center}
+    \ifthenelse{\boolean{identity}}{\@csenidentity}{}
+    \ifthenelse{\boolean{marking}}{\ifthenelse{\boolean{nomarktbl}}{}{
+        \vspace*{2cm}
+        \begin{center}
+          {\small Do \textbf{not} write anything into this table!}\\
+          \@csenmarktable
+        \end{center}\vspace*{2cm}}}{}
+  }}
 
 \AtEndDocument{%
-  \@mkscratch
+  \ifthenelse{\boolean{solution}}{}{\@mkscratch}%
+  \ifthenelse{\boolean{formula}}{\@mkformula}{}%
   \label{lastpage}%
 }
 
