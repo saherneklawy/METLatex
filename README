@@ -32,3 +32,4 @@ To do:
 - testing
 - cleanup (consistently prefix variable names and booleans, tighten code)
 - Redo formula sheet (and maybe solutions) by using the answers package
+- nicer subproblem handling
