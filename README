@@ -31,4 +31,4 @@ Implemented so far:
 To do:
 - testing
 - cleanup (consistently prefix variable names and booleans, tighten code)
-- better collecting mechanism for formulas for the formula sheet (capable of specifying displaymath)
+- Redo formula sheet (and maybe solutions) by using the answers package

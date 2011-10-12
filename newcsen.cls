@@ -178,6 +178,15 @@
 \newcounter{@scratchpage}
 \setcounter{@scratchpage}{0}
 
+\newcounter{csencurrentmarks}
+\setcounter{csencurrentmarks}{0}
+
+\newcounter{csensubmarktotal}[exercise]
+\setcounter{csensubmarktotal}{0}
+
+\newcounter{csensubbonustotal}[exercise]
+\setcounter{csensubbonustotal}{0}
+
 %----------------------------------------------------------------------%
 %   Options
 
@@ -428,24 +437,24 @@
     \item Non-programmable calculators are allowed
     \item No books or other aids are permitted for this test.
     \item This exam booklet contains a total of \textbf{\Pages\
-        pages}, including this one.
-      \ifthenelse{\value{scratchpages}>0}{\@scratchspelled\ extra
-        sheets of scratch paper are attached and have to be kept
-        attached.}{}
+        pages}, including this one. %
+      \ifthenelse{\value{scratchpages}>0}{\ifthenelse{\boolean{marking}}{\@scratchspelled\
+          extra sheets of scratch paper are attached and have to be
+          kept attached. }{}}{}%
       \ifthenelse{\boolean{formula}}{A fomula sheet is attached and
         may be detached for convenience
         (page~\pageref{formulapage}). The formula sheet does not need
-        to be submitted.}{}
+        to be submitted. }{}%
       \textbf{Note that if one or more pages are missing, you will
         lose their points. Thus, you must check that your exam booklet
         is complete.}
     \item Write your solutions in the space provided. If you need more
       space, write on the back of the sheet containing the
-      problem\ifthenelse{\value{scratchpages}>0}{ or on the
+      problem\ifthenelse{\value{scratchpages}>0}{\ifthenelse{\boolean{marking}}{ or on the
       \@scratchspelled[l]\ extra sheets and indicate that clearly on
       the problem page. \textbf{Scratch sheets will not be graded
         unless a reference on the problem page indicates that the
-        solution extends to the scratch sheets.}}{.}
+        solution extends to the scratch sheets.}}{.}}{.}
     \item When you are told that time is up, stop working on the test.
     \end{enumerate}}
 \newcommand{\Instructions}[1]{\renewcommand{\@cseninstructions}{#1}}
@@ -490,16 +499,17 @@
   \@bonuslabel\hspace*{\@exerciseheadskip}}
 
 \newcommand{\@exercisemarks}[1]{%
-  \ifthenelse{\equal{#1}{}}%
-  {}%
-  {\ifthenelse{\equal{#1}{1}}%
-    {(1~Mark)}%
-    {(#1~Marks)}}}%
+  \ifthenelse{\boolean{marking}}{%
+    \ifthenelse{\equal{#1}{}}%
+    {}%
+    {\ifthenelse{\equal{#1}{1}}%
+      {(1 Mark)}%
+      {(#1 Marks)}}}{}}%
 
 \renewcommand{\labelenumi}{(\alph{enumi})}
 
-\newcommand{\Mark}[1]{\hspace*{\stretch{1}}{\@exercisemarks{#1}}}
-\newcommand{\Bonus}[1]{\hspace*{\stretch{1}}{\textbf{\@exercisemarks{#1}}}}
+\newcommand{\Mark}[1]{\addtocounter{csensubmarktotal}{#1}\hspace*{\stretch{1}}{\@exercisemarks{#1}}}
+\newcommand{\Bonus}[1]{\addtocounter{csensubbonustotal}{#1}\hspace*{\stretch{1}}{\textbf{\@exercisemarks{#1}}}}
 
 \newcommand{\@exercisetheme}[1]{%
   \ifthenelse{\equal{#1}{}}%
@@ -513,12 +523,12 @@
 
 \newcommand{\@exercisehead}[3]{%
   {\samepage
-    \@exerciselabelplusskip{}#2\ifthenelse{\boolean{marking}}{\hfill\ifthenelse{\equal{#1}{}}{\textbf{Marks
+    \@exerciselabelplusskip{}#2\ifthenelse{\boolean{marking}}{\hfill\ifthenelse{\equal{#1}{}}{\textbf{\color{red}Marks
         not specified}}{\@exercisemarks{#1}}}{}\@exercisetheme{#3}\par\nopagebreak[4]}}
 
 \newcommand{\@bonushead}[3]{%
   {\samepage
-    \@bonuslabelplusskip{}#2\ifthenelse{\boolean{marking}}{\hfill\ifthenelse{\equal{#1}{}}{\textbf{Marks
+    \@bonuslabelplusskip{}#2\ifthenelse{\boolean{marking}}{\hfill\ifthenelse{\equal{#1}{}}{\textbf{\color{red}Marks
         not specified}}{\@exercisemarks{#1}}}{}\@bonustheme{#3}\par\nopagebreak[4]}}
 
 \newcommand{\@addexercise}[1]{%
@@ -547,7 +557,14 @@
           \noexpand\eaddto{\noexpand\marksrow}{Bonus: #1&}}}}}{}}
 
 \newenvironment{exercise}[3]{%
-  \@addexercise{#1}\@exerciseskip\@exercisehead{#1}{#2}{#3}}{}
+  \ifthenelse{\equal{#1}{}}{\setcounter{csencurrentmarks}{0}}{\setcounter{csencurrentmarks}{#1}}%
+  \@addexercise{#1}\@exerciseskip\@exercisehead{#1}{#2}{#3}}{%
+  \ifthenelse{\boolean{marking}}{%
+    \ifthenelse{\value{csensubmarktotal}>0}{%
+      \ifthenelse{\value{csencurrentmarks}=\value{csensubmarktotal}}{}{%
+        ~\\\textbf{\color{red} Subproblem marks don't add up:
+          Specified marks: \arabic{csencurrentmarks}, Sum of
+          subproblems: \arabic{csensubmarktotal}, Bonus: \arabic{csensubbonustotal}}}}{}}{}}
 
 \newenvironment{bonusexercise}[3]{%
   \@addbonus{#1}\@exerciseskip\@bonushead{#1}{#2}{#3}}{}
@@ -780,10 +797,12 @@
           \ifthenelse{\boolean{nobarcode}}{}{\@barcodebox}}}{}
     \end{center}
     \ifthenelse{\boolean{noinstruct}{}}{}{%
-      \textbf{Instructions. Please read carefully before proceeding.}
+      \ifthenelse{\boolean{mock}}{\textbf{Typical regulations of an exam like this:}}%
+      {\textbf{Instructions. Please read carefully before proceeding.}}
       \@cseninstructions}
     \begin{center}
-      \textbf{\large Good luck!}
+      \ifthenelse{\boolean{mock}}{}{
+        \textbf{\large Good luck!}}
     \end{center}
     \vspace*{\stretch{1}}
     \ifthenelse{\boolean{marking}}{\ifthenelse{\boolean{nomarktbl}}{}{
@@ -803,8 +822,9 @@
             Define submission date!\\}{}}{%
           \rule{\linewidth}{2pt}
           \raisebox{-.25\baselineskip}{%
-            \ifthenelse{\boolean{solution}}{\bfseries Model Solutions}%
-            {\ifthenelse{\boolean{marking}}{\bfseries Submission: }{Discussion: }{\@csendate}}}
+            \ifthenelse{\boolean{solution}}{\bfseries Model Solutions}{%
+              \ifthenelse{\boolean{quiz}\OR\boolean{popquiz}}{}
+              {\ifthenelse{\boolean{marking}}{\bfseries Submission: }{Discussion: }}{\@csendate}}}
           \rule{\linewidth}{2pt}}}
     \end{center}
     \ifthenelse{\boolean{identity}}{\@csenidentity}{}
@@ -817,7 +837,7 @@
   }}
 
 \AtEndDocument{%
-  \ifthenelse{\boolean{solution}}{}{\@mkscratch}%
+  \ifthenelse{\boolean{solution}}{}{\ifthenelse{\boolean{marking}}{\@mkscratch}{}}%
   \ifthenelse{\boolean{formula}}{\@mkformula}{}%
   \label{lastpage}%
 }
