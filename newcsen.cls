@@ -91,8 +91,10 @@
 %                        (optional title)
 %   \SolutionSpace{}   - sets a space to be left for the solution if
 %                        the solution is not shown
-%   \Mark{}            - set marks for sub-exercises (no checks, no
-%                        automatic adding! only typesetting)
+%   \Mark{}            - set marks for sub-exercises (checks if sum is
+%                        correct, but no automatic adding)
+%   \Bonus{}           - same as \Mark{}, but sets boldfont mark which
+%                        is not counted (bonus mark)
 
 %----------------------------------------------------------------------%
 %   Commands for unofficial use only
@@ -131,7 +133,7 @@
 \makeatletter
 
 %----------------------------------------------------------------------%
-%   Options and flags
+%   Flags
 
 \newboolean{solution}%     - Solution is shown
 \newboolean{numbered}%     - Assessment is numbered
@@ -370,14 +372,6 @@
   \ifthenelse{\equal{\@csenversion}{}}{}{(\@csenversion)}%
   \ifthenelse{\boolean{numbered}}{--}{}\arabic{exercise}}%
 
-\newcommand{\@spelled}[2][u]{%
-  \ifthenelse{\equal{#1}{l}}%
-  {\ifcase#2\or{one}\or{two}\or{three}\or{four}\or{five}\or{six}\or{seven}\or{eight}\or{nine}\or{ten}\or{eleven}\or{Twelve}\else\@ctrerr\fi}
-  {\ifcase#2\or{One}\or{Two}\or{Three}\or{Four}\or{Five}\or{Six}\or{Seven}\or{Eight}\or{Nine}\or{Ten}\or{Eleven}\or{Twelve}\else\@ctrerr\fi}}
-
-\newcommand{\@scratchspelled}[1][u]{%
-  \ifthenelse{\value{scratchpages}>12}{\arabic{scratchpages}}{\@spelled[#1]{\value{scratchpages}}}}
-
 \newcommand{\@cseninst}{The German University in Cairo}
 \newcommand{\Institute}[1]{\renewcommand{\@csendpt}{#1}}
 
@@ -413,6 +407,14 @@
 
 \newcommand{\Scratchpages}{\arabic{scratchpages}}
 \newcommand{\Scratchpaper}[1]{\setcounter{scratchpages}{#1}}
+
+\newcommand{\@spelled}[2][u]{%
+  \ifthenelse{\equal{#1}{l}}%
+  {\ifcase#2\or{one}\or{two}\or{three}\or{four}\or{five}\or{six}\or{seven}\or{eight}\or{nine}\or{ten}\or{eleven}\or{Twelve}\else\@ctrerr\fi}
+  {\ifcase#2\or{One}\or{Two}\or{Three}\or{Four}\or{Five}\or{Six}\or{Seven}\or{Eight}\or{Nine}\or{Ten}\or{Eleven}\or{Twelve}\else\@ctrerr\fi}}
+
+\newcommand{\@scratchspelled}[1][u]{%
+  \ifthenelse{\value{scratchpages}>12}{\arabic{scratchpages}}{\@spelled[#1]{\value{scratchpages}}}}
 
 \newcommand{\@mkscratch}%
 {\multido{\i=1+1}{\value{scratchpages}}{\newpage%
@@ -638,23 +640,21 @@
       {\toks@\expandafter{#1#2}%
         \xdef#1{\the\toks@}}%
     \fi
-  \fi
-}
+  \fi}
 \newcommand*\eaddto[2]{%
-   \edef\tmp{#2}%
-   \expandafter\addto
-   \expandafter#1%
-   \expandafter{\tmp}%
-}
-\def\numbersrow{}
-\def\marksrow{}
-\def\emptyrow{}
+  \edef\tmp{#2}%
+  \expandafter\addto
+  \expandafter#1%
+  \expandafter{\tmp}}%
 
 %----------------------------------------------------------------------%
 %   Table of results
 
 \newsavebox\@ignore
 \newcommand{\@csenmarktable}{%
+  \def\numbersrow{}%
+  \def\marksrow{}%
+  \def\emptyrow{}%
   \savebox\@ignore{\@starttoc{loq}}
   \begin{tabular}{| >{\columncolor[gray]{0.9}}r | *{\value{marktableexercise}}{c |}| c |}
     \hline
@@ -687,7 +687,6 @@
     \item[\large Formulas:]~
     \@starttoc{for}
   \end{description}}
-
 
 %----------------------------------------------------------------------%
 %   Identity
