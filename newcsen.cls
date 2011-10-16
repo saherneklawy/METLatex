@@ -778,7 +778,7 @@
     \thispagestyle{plain}
     \noindent
     \ifthenelse{\boolean{logo}}{%
-      \includegraphics[height=3\baselineskip]{\@logofile}\hspace*{1mm}}{}
+      \includegraphics[height=2\baselineskip+1em]{\@logofile}\hspace*{1mm}}{}
     \begin{minipage}[b]{.5\linewidth}
       \bfseries\sf \@cseninst\\\@csendpt\\\@csenlecturer
     \end{minipage}
