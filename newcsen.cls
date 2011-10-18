@@ -725,7 +725,7 @@
 %----------------------------------------------------------------------%
 %   Layout and headings
 
-\geometry{paper=a4paper, left=15mm, right=15mm, top=10mm, bottom=5mm,
+\geometry{paper=a4paper, left=15mm, right=15mm, top=10mm, bottom=10mm,
   headheight=3\baselineskip, includehead, includefoot}
 \pagestyle{fancy}
 \lhead{\ifthenelse{\boolean{logo}}{
