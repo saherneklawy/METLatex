@@ -505,8 +505,8 @@
     \ifthenelse{\equal{#1}{}}%
     {}%
     {\ifthenelse{\equal{#1}{1}}%
-      {(1 Mark)}%
-      {(#1 Marks)}}}{}}%
+      {(1~Mark)}%
+      {(#1~Marks)}}}{}}%
 
 \renewcommand{\labelenumi}{(\alph{enumi})}
 
