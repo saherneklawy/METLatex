@@ -433,32 +433,38 @@
   \ifthenelse{\boolean{solution}}{}{\vspace*{#1}}}
 
 \newcommand{\@cseninstructions}{%
-    \begin{enumerate}
-      \ifthenelse{\equal{\@csenduration}{}}{}{
-      \item The duration of this exam is \textbf{\@csenduration}.}
-    \item Non-programmable calculators are allowed
-    \item No books or other aids are permitted for this test.
-    \item This exam booklet contains a total of \textbf{\Pages\
-        pages}, including this one. %
-      \ifthenelse{\value{scratchpages}>0}{\ifthenelse{\boolean{marking}}{\@scratchspelled\
-          extra sheets of scratch paper are attached and have to be
-          kept attached. }{}}{}%
+  \begin{enumerate}
+    \ifthenelse{\equal{\@csenduration}{}}{}{
+    \item The duration of this exam is \textbf{\@csenduration}.}
+  \item Non-programmable calculators are allowed.
+  \item No books or other aids are permitted for this test.
+  \item This exam booklet contains a total of \textbf{\Pages\ pages},
+    including this one. %
+    \ifthenelse{\boolean{solution}}{%
       \ifthenelse{\boolean{formula}}{A fomula sheet is attached and
         may be detached for convenience
-        (page~\pageref{formulapage}). The formula sheet does not need
-        to be submitted. }{}%
-      \textbf{Note that if one or more pages are missing, you will
-        lose their points. Thus, you must check that your exam booklet
-        is complete.}
+        (page~\pageref{formulapage}). }{}}{%
+        \ifthenelse{\value{scratchpages}>0}{\ifthenelse{\boolean{marking}}{\@scratchspelled\
+            extra sheets of scratch paper are attached and have to be
+            kept attached. }{}}{}%
+        \ifthenelse{\boolean{formula}}{A fomula sheet is attached and
+          may be detached for convenience
+          (page~\pageref{formulapage}). The formula sheet does not
+          need to be submitted. }{}%
+        \textbf{Note that if one or more pages are missing, you will
+          lose their points. Thus, you must check that your exam
+          booklet is complete.}
     \item Write your solutions in the space provided. If you need more
       space, write on the back of the sheet containing the
-      problem\ifthenelse{\value{scratchpages}>0}{\ifthenelse{\boolean{marking}}{ or on the
-      \@scratchspelled[l]\ extra sheets and indicate that clearly on
-      the problem page. \textbf{Scratch sheets will not be graded
-        unless a reference on the problem page indicates that the
-        solution extends to the scratch sheets.}}{.}}{.}
-    \item When you are told that time is up, stop working on the test.
-    \end{enumerate}}
+      problem\ifthenelse{\value{scratchpages}>0}{\ifthenelse{\boolean{marking}}{
+          or on the \@scratchspelled[l]\ extra sheets and indicate
+          that clearly on the problem page. \textbf{Scratch sheets
+            will not be graded unless a reference on the problem page
+            indicates that the solution extends to the scratch
+            sheets.}}{.}}{.}
+    \item When you are told that time is up, stop working on the
+      test.}%
+  \end{enumerate}}
 \newcommand{\Instructions}[1]{\renewcommand{\@cseninstructions}{#1}}
 
 \newcommand{\AddFormula}[2][]{%
@@ -793,14 +799,19 @@
       {\Large \@assessmentform\\[1cm]}
       \ifthenelse{\boolean{marking}}{%
         \ifthenelse{\boolean{identity}}{\@csenidentity}{%
-          \ifthenelse{\boolean{nobarcode}}{}{\@barcodebox}}}{}
+          \ifthenelse{\boolean{nobarcode} \OR
+            \boolean{solution}}{}{\@barcodebox}}}{}%
+      \ifthenelse{\boolean{solution}}{
+        \rule{\linewidth}{2pt}
+        \raisebox{-.25\baselineskip}{\bfseries Model Solutions}
+        \rule{\linewidth}{2pt}}{}%
     \end{center}
     \ifthenelse{\boolean{noinstruct}{}}{}{%
       \ifthenelse{\boolean{mock}}{\textbf{Typical regulations of an exam like this:}}%
       {\textbf{Instructions. Please read carefully before proceeding.}}
       \@cseninstructions}
     \begin{center}
-      \ifthenelse{\boolean{mock}}{}{
+      \ifthenelse{\boolean{mock} \OR \boolean{solution}}{}{
         \textbf{\large Good luck!}}
     \end{center}
     \vspace*{\stretch{1}}
