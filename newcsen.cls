@@ -700,11 +700,11 @@
 \newcommand{\@csenidentity}{%
   \vspace*{1cm}
   {\large Name}\dotfill%
-  \begin{tabular}[b]{|r|*{7}{p{1.5em}|}}
+  \begin{tabular}[b]{|r|*{8}{p{1.5em}|}}
     \hline
     \raisebox{-.75em}{Student ID \#} & & &
     \raisebox{-.75em}{\parbox{\linewidth}{\centering \textbf{---}}}
-    & & & & \\[1.5em]
+    & & & & & \\[1.5em]
     \hline
   \end{tabular}%
   \\[1cm]
